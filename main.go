@@ -5,6 +5,7 @@ import (
 	"image"
 	_ "image/jpeg"
 	"os"
+	"strconv"
 )
 
 func AppendCharacterToFile(filename string, char rune) error {
@@ -41,11 +42,16 @@ func getChar(brightness int) string {
 
 func main() {
 
-	if len(os.Args) < 1 {
-		fmt.Println("Please provide an image")
+	if len(os.Args) < 2 {
+		fmt.Println("Please two arguments, format:")
+		fmt.Println("go run main.go <image_path> <resolution (parse every n pixel)>")
 		return
 	}
-
+	resolution, err := strconv.Atoi(os.Args[2])
+	if err != nil {
+		fmt.Println("Please provide a valid resolution")
+		return
+	}
 	file, err := os.Open(os.Args[1])
 	if err != nil {
 		fmt.Println(err)
@@ -62,8 +68,8 @@ func main() {
 	// var maxBrightness float64 = 42774765
 	var art = make([][]string, bounds.Max.Y)
 	var highest float64 = 0
-	for y := bounds.Min.Y; y < bounds.Max.Y; y += 8 {
-		for x := bounds.Min.X; x < bounds.Max.X; x += 8 {
+	for y := bounds.Min.Y; y < bounds.Max.Y; y += resolution {
+		for x := bounds.Min.X; x < bounds.Max.X; x += resolution {
 			r, g, b, _ := img.At(x, y).RGBA()
 
 			var brightness float64 = (float64(100) / 65535) * ((float64(r) + float64(g) + float64(b)) / 3)
